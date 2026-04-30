@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>임영민 · AWS Cloud Infrastructure Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: rgba(255,255,255,0.07);
+    --accent: #00c8ff;
+    --accent2: #ff6b35;
+    --accent3: #7c3aed;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+    background: rgba(10,14,26,0.85);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 56px;
+  }
+
+  .nav-brand {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 100px 80px 60px;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,200,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at 60% 50%, black 30%, transparent 70%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,200,255,0.08) 0%, transparent 70%);
+    right: -100px; top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 720px; }
+
+  .hero-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-label::before {
+    content: '';
+    width: 32px; height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 7vw, 88px);
+    line-height: 1;
+    letter-spacing: 2px;
+    margin-top: 20px;
+    margin-bottom: 28px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .title-line {
+    display: block;
+  }
+
+  .title-accent { color: var(--accent); }
+
+  .hero-desc {
+    font-size: 15px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    max-width: 560px;
+    margin-bottom: 40px;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag {
+    padding: 4px 12px;
+    background: rgba(0,200,255,0.08);
+    border: 1px solid rgba(0,200,255,0.2);
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 48px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  section:nth-child(even) { background: rgba(255,255,255,0.015); }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    letter-spacing: 2px;
+  }
+
+  .section-title {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    margin-left: 16px;
+  }
+
+  .hero-name {
+    margin-top: 36px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: inline-block;
+  }
+
+  /* ── OVERVIEW GRID ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px;
+    transition: border-color 0.25s, transform 0.25s;
+  }
+
+  .card:hover {
+    border-color: rgba(0,200,255,0.25);
+    transform: translateY(-2px);
+  }
+
+  .card-icon {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .card-body {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.75;
+  }
+
+  /* ── ARCH FLOW ── */
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 32px;
+    overflow-x: auto;
+    margin-bottom: 32px;
+  }
+
+  .arch-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .arch-step-box {
+    background: rgba(0,200,255,0.08);
+    border: 1px solid rgba(0,200,255,0.25);
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    white-space: nowrap;
+    font-weight: 700;
+  }
+
+  .arch-step-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  .arch-arrow {
+    color: var(--text-muted);
+    font-size: 18px;
+    margin: 0 8px;
+    flex-shrink: 0;
+    padding-bottom: 18px;
+  }
+
+  /* ── REQUIREMENTS TABLE ── */
+  .req-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .req-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+
+  .req-card:hover { border-color: rgba(124,58,237,0.4); }
+
+  .req-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: rgba(124,58,237,0.08);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .req-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+  }
+
+  .badge-sys { background: rgba(0,200,255,0.15); color: var(--accent); }
+  .badge-sfr { background: rgba(16,185,129,0.15); color: var(--green); }
+  .badge-ser { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge-dar { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .badge-per { background: rgba(124,58,237,0.15); color: #a78bfa; }
+  .badge-ops { background: rgba(255,107,53,0.15); color: var(--accent2); }
+
+  .req-card-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .req-card-body {
+    padding: 16px 20px;
+  }
+
+  .req-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .req-item:last-child { border-bottom: none; }
+
+  .req-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    padding-top: 2px;
+    min-width: 64px;
+  }
+
+  .req-desc { color: var(--text-dim); line-height: 1.6; font-size: 13px; }
+
+  .req-proposal {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(0,200,255,0.04);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ── COST TABLE ── */
+  .cost-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead tr {
+    background: rgba(0,200,255,0.06);
+  }
+
+  th {
+    padding: 12px 20px;
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+  }
+
+  td {
+    padding: 12px 20px;
+    font-size: 13px;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+  .cost-service {
+    font-weight: 700;
+    color: #fff;
+    font-size: 13px;
+  }
+
+  .cost-qty {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .cost-unit {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .cost-monthly {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .cost-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .cost-total-row td {
+    background: rgba(0,200,255,0.06);
+    border-top: 1px solid rgba(0,200,255,0.2);
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .cost-total-row .cost-monthly {
+    color: var(--accent);
+    font-size: 15px;
+  }
+
+  /* ── ROADMAP ── */
+  .roadmap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .roadmap-phase {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+
+  .roadmap-phase:hover { border-color: rgba(0,200,255,0.2); }
+
+  .roadmap-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .roadmap-phase-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .phase-1 .roadmap-phase-num { background: rgba(0,200,255,0.15); color: var(--accent); }
+  .phase-2 .roadmap-phase-num { background: rgba(124,58,237,0.15); color: #a78bfa; }
+  .phase-3 .roadmap-phase-num { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .phase-4 .roadmap-phase-num { background: rgba(16,185,129,0.15); color: var(--green); }
+
+  .roadmap-phase-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .roadmap-phase-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .roadmap-body { padding: 18px 22px; }
+
+  .roadmap-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .roadmap-item:last-child { border-bottom: none; }
+
+  .roadmap-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+
+  .phase-1 .roadmap-dot { background: var(--accent); }
+  .phase-2 .roadmap-dot { background: #a78bfa; }
+  .phase-3 .roadmap-dot { background: var(--yellow); }
+  .phase-4 .roadmap-dot { background: var(--green); }
+
+  /* ── SKILLS / STACK ── */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 48px;
+  }
+
+  .stack-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .stack-group-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stack-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .stack-item {
+    padding: 4px 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.3px;
+  }
+
+  /* ── RAG FLOW ── */
+  .rag-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 32px;
+    overflow-x: auto;
+    margin-bottom: 32px;
+  }
+
+  .rag-step-box {
+    background: rgba(124,58,237,0.08);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: #a78bfa;
+    white-space: nowrap;
+    font-weight: 700;
+  }
+
+  /* ── DATA SOURCE CARDS ── */
+  .datasource-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .datasource-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px;
+    transition: border-color 0.25s;
+  }
+
+  .datasource-card:hover { border-color: rgba(124,58,237,0.3); }
+
+  .ds-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ds-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  .ds-gmail .ds-dot { background: #ea4335; }
+  .ds-drive .ds-dot { background: #34a853; }
+  .ds-s3 .ds-dot { background: var(--yellow); }
+
+  .ds-item {
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .ds-item:last-child { border-bottom: none; }
+
+  .ds-item::before {
+    content: '—';
+    color: var(--text-muted);
+    font-size: 10px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  /* ── RESULTS ── */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+
+  .result-card:hover { border-color: rgba(0,200,255,0.2); }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .result-card:nth-child(1)::before { background: var(--accent); }
+  .result-card:nth-child(2)::before { background: var(--green); }
+  .result-card:nth-child(3)::before { background: var(--accent2); }
+  .result-card:nth-child(4)::before { background: #a78bfa; }
+
+  .result-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    line-height: 1;
+    margin-bottom: 4px;
+    color: #fff;
+  }
+
+  .result-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+  }
+
+  .result-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  /* ── RETROSPECTIVE ── */
+  .retro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .retro-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    gap: 18px;
+    transition: border-color 0.25s;
+  }
+
+  .retro-card:hover { border-color: rgba(0,200,255,0.2); }
+
+  .retro-idx {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: rgba(0,200,255,0.2);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 32px;
+  }
+
+  .retro-content {}
+
+  .retro-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .retro-body {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.75;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1;
+    position: relative;
+  }
+
+  .footer-brand {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .footer-brand strong { color: var(--accent); }
+
+  .footer-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-content > * {
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .hero-content > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero-content > *:nth-child(2) { animation-delay: 0.2s; }
+  .hero-content > *:nth-child(3) { animation-delay: 0.3s; }
+  .hero-content > *:nth-child(4) { animation-delay: 0.4s; }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal-hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal-hidden.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── PRINT / PDF ── */
+  @media print {
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    body::before { display: none; }
+    nav { display: none !important; }
+
+    .reveal,
+    .reveal-hidden {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+    .hero-content > * {
+      animation: none !important;
+      opacity: 1 !important;
+    }
+
+    section {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .card, .req-card, .roadmap-phase, .retro-card,
+    .result-card, .datasource-card, .stack-group,
+    .cost-table-wrap, .arch-flow, .rag-flow {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .section-header {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+    .overview-grid, .req-grid, .roadmap, .retro-grid,
+    .results-grid, .datasource-grid, .stack-grid {
+      break-inside: auto;
+    }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    section { padding: 60px 24px; }
+    .hero { padding: 100px 24px 60px; }
+    nav { padding: 0 20px; }
+    .overview-grid,
+    .roadmap,
+    .retro-grid { grid-template-columns: 1fr; }
+    .datasource-grid,
+    .results-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    footer { padding: 24px; flex-direction: column; gap: 8px; }
+  }
+
+  /* ── INLINE HIGHLIGHT ── */
+  .hl { color: var(--accent); font-weight: 700; }
+  .hl-g { color: var(--green); }
+  .hl-y { color: var(--yellow); }
+  .hl-p { color: #a78bfa; }
+
+  /* table category col */
+  .cat-infra  { color: var(--accent); }
+  .cat-compute { color: var(--green); }
+  .cat-network { color: var(--yellow); }
+  .cat-db { color: #a78bfa; }
+  .cat-security { color: var(--red); }
+  .cat-ai { color: var(--accent2); }
+  .cat-cdn { color: #34d399; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">YM.PORTFOLIO / AWS INFRA</div>
+  <ul class="nav-links">
+    <li><a href="#overview">개요</a></li>
+    <li><a href="#requirements">요구사항</a></li>
+    <li><a href="#web">웹 인프라</a></li>
+    <li><a href="#ai">AI RAG</a></li>
+    <li><a href="#cost">비용</a></li>
+    <li><a href="#roadmap">향후 계획</a></li>
+    <li><a href="#retro">회고</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-label">MSP 솔루션 아키텍트 양성과정 · 최종 프로젝트 · 2025.04 – 2025.06</div>
+    <h1 class="hero-title">
+      <span class="title-line">AWS 기반</span>
+      <span class="title-line title-accent">쇼핑몰 운영</span>
+      <span class="title-line">자동화 인프라</span>
+    </h1>
+    <p class="hero-desc">
+      패션 이커머스 Lurix의 서비스 불안정 문제를 해소하고, 사내 지식 관리 자동화를 위해
+      AWS 클라우드 인프라를 설계·구축한 프로젝트입니다.
+      고가용성 웹 인프라와 AI 기반 사내 RAG 시스템 구현을 핵심 목표로 삼았습니다.
+    </p>
+    <div class="hero-tags">
+      <span class="tag">CloudFront</span>
+      <span class="tag">ALB</span>
+      <span class="tag">Auto Scaling</span>
+      <span class="tag">WAF</span>
+      <span class="tag">Lambda</span>
+      <span class="tag">Amazon Kendra</span>
+      <span class="tag">Amazon Bedrock</span>
+      <span class="tag">Session Manager</span>
+      <span class="tag">S3</span>
+      <span class="tag">RDS Multi-AZ</span>
+    </div>
+    <div class="hero-name">임영민 · Cloud Infrastructure Engineer</div>
+  </div>
+</div>
+
+<!-- ──────────── 01 OVERVIEW ──────────── -->
+<section id="overview">
+  <div class="section-header reveal">
+    <span class="section-num">01</span>
+    <h2 class="section-title">프로젝트 개요</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="overview-grid reveal">
+    <div class="card">
+      <div class="card-icon">🚧</div>
+      <div class="card-title">문제 — 서비스 불안정</div>
+      <div class="card-body">
+        단일 배포 단위(모놀리식)로 운영되어 트래픽 급증 시 장애가 빈번했으며,
+        신규 기능 배포 시 전체 서비스가 영향을 받아 시장 대응 속도가 저하되었습니다.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗂️</div>
+      <div class="card-title">문제 — 지식 관리 부재</div>
+      <div class="card-body">
+        부서별 시스템에 흩어진 사내 문서를 키워드 검색으로 찾는 데 한계가 있었고,
+        복잡한 업무 질문에 즉각 답변하기 어려운 구조였습니다.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">목표 — 고가용성 웹 인프라</div>
+      <div class="card-body">
+        ALB + Auto Scaling Group으로 트래픽 변화에 자동 대응하고,
+        Multi-AZ 배포로 장애 발생 시에도 무중단 운영을 실현합니다.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤖</div>
+      <div class="card-title">목표 — AI 기반 RAG 시스템</div>
+      <div class="card-body">
+        Gmail·Google Drive·S3를 Amazon Kendra로 통합 색인하고,
+        Amazon Bedrock(Claude 3 Haiku)으로 자연어 Q&A를 자동화합니다.
+      </div>
+    </div>
+  </div>
+
+  <div class="stack-grid reveal">
+    <div class="stack-group">
+      <div class="stack-group-label">네트워크 / 보안</div>
+      <div class="stack-items">
+        <span class="stack-item">Route 53</span>
+        <span class="stack-item">CloudFront</span>
+        <span class="stack-item">WAF</span>
+        <span class="stack-item">ACM</span>
+        <span class="stack-item">VPC</span>
+        <span class="stack-item">NAT Gateway</span>
+        <span class="stack-item">IGW</span>
+      </div>
+    </div>
+    <div class="stack-group">
+      <div class="stack-group-label">컴퓨팅 / 스토리지</div>
+      <div class="stack-items">
+        <span class="stack-item">EC2 (Amazon Linux)</span>
+        <span class="stack-item">ALB</span>
+        <span class="stack-item">Auto Scaling</span>
+        <span class="stack-item">Lambda</span>
+        <span class="stack-item">S3</span>
+        <span class="stack-item">EBS</span>
+      </div>
+    </div>
+    <div class="stack-group">
+      <div class="stack-group-label">AI / 검색</div>
+      <div class="stack-items">
+        <span class="stack-item">Amazon Kendra</span>
+        <span class="stack-item">Amazon Bedrock</span>
+        <span class="stack-item">Claude 3 Haiku</span>
+        <span class="stack-item">Llama Model</span>
+      </div>
+    </div>
+    <div class="stack-group">
+      <div class="stack-group-label">운영 / 관리</div>
+      <div class="stack-items">
+        <span class="stack-item">Session Manager</span>
+        <span class="stack-item">CloudWatch</span>
+        <span class="stack-item">SNS</span>
+        <span class="stack-item">IAM</span>
+        <span class="stack-item">KMS</span>
+        <span class="stack-item">RDS Multi-AZ</span>
+        <span class="stack-item">AWS Backup</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── 02 REQUIREMENTS ──────────── -->
+<section id="requirements">
+  <div class="section-header reveal">
+    <span class="section-num">02</span>
+    <h2 class="section-title">요구사항 정의</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <p class="reveal" style="color:var(--text-dim);font-size:13px;margin-bottom:32px;max-width:660px;line-height:1.8;">
+    사업 목표를 달성하기 위해 <span class="hl">총 23개</span>의 요구사항을 8개 카테고리로 체계적으로 정의하고 문서화했습니다.
+    각 요구사항은 고유 번호·정의·세부 내용·제안 내용 구조로 작성하여 추적 가능성을 확보했습니다.
+  </p>
+
+  <div class="req-grid reveal">
+
+    <!-- SYS -->
+    <div class="req-card">
+      <div class="req-card-header">
+        <span class="req-badge badge-sys">SYS</span>
+        <span class="req-card-name">시스템 요구사항 · 3건</span>
+      </div>
+      <div class="req-card-body">
+        <div class="req-item">
+          <span class="req-num">SYS-001</span>
+          <div>
+            <div class="req-desc">AWS 인프라 시스템 구축 — EC2 t2.micro (Bastion) / m5.large (App·DB) 스펙 선정</div>
+            <div class="req-proposal">Bastion: t2.micro (2vCPU / 1GiB) · App·DB: m5.large (2vCPU / 8GiB)</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">SYS-002</span>
+          <div>
+            <div class="req-desc">RDS 인스턴스 — MySQL 8.0 / PostgreSQL, Multi-AZ 자동 페일오버</div>
+            <div class="req-proposal">프로덕션: Multi-AZ · 개발: db.t3.micro 저비용 분리 구성</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">SYS-003</span>
+          <div>
+            <div class="req-desc">네트워크 안정성 및 보안 강화 — VPC Gateway Endpoint, ALB + ASG</div>
+            <div class="req-proposal">S3 접근을 VPC Endpoint로 내부화하여 인터넷 트래픽 경로 제거</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SFR -->
+    <div class="req-card">
+      <div class="req-card-header">
+        <span class="req-badge badge-sfr">SFR</span>
+        <span class="req-card-name">기능 요구사항 · 4건</span>
+      </div>
+      <div class="req-card-body">
+        <div class="req-item">
+          <span class="req-num">SFR-001</span>
+          <div>
+            <div class="req-desc">NAT Gateway — Private Subnet의 아웃바운드 허용, 인바운드 차단</div>
+            <div class="req-proposal">Public Subnet에 NAT GW 배포 + Elastic IP 할당 · 고가용성 분산 배치</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">SFR-002</span>
+          <div>
+            <div class="req-desc">Internet Gateway — VPC ↔ 인터넷 양방향 통신 확보</div>
+            <div class="req-proposal">IGW 생성 후 VPC 연결 · Public Subnet 라우팅 테이블 설정</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">SFR-003</span>
+          <div>
+            <div class="req-desc">Route 53 — 도메인 DNS 쿼리 처리 및 CloudFront / ALB 연결</div>
+            <div class="req-proposal">Hosted Zone 생성 · Alias 레코드로 엔드포인트 라우팅</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">SFR-004</span>
+          <div>
+            <div class="req-desc">CloudFront — 정적 콘텐츠 CDN 캐싱, HTTPS 강제, WAF 연동</div>
+            <div class="req-proposal">/static/* → S3 Origin · 그 외 → ALB Origin 분기 라우팅</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SER -->
+    <div class="req-card">
+      <div class="req-card-header">
+        <span class="req-badge badge-ser">SER</span>
+        <span class="req-card-name">보안 요구사항 · 4건</span>
+      </div>
+      <div class="req-card-body">
+        <div class="req-item">
+          <span class="req-num">SER-001</span>
+          <div>
+            <div class="req-desc">데이터 암호화 — 저장(RDS·S3·EBS) 및 전송(HTTPS) 전 구간 암호화</div>
+            <div class="req-proposal">KMS 서버 측 암호화 · ACM으로 SSL/TLS 인증서 관리</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">SER-002</span>
+          <div>
+            <div class="req-desc">네트워크 보안 — 서비스별 독립 Security Group, 관리 포트 IP 제한</div>
+            <div class="req-proposal">인스턴스 레벨 SG + 서브넷 레벨 NACL 이중 통제</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">SER-003</span>
+          <div>
+            <div class="req-desc">접근 제어 — IAM 최소 권한 원칙, SSH 포트 미개방</div>
+            <div class="req-proposal">Session Manager 기반 접근 · IAM Role 중앙 관리</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">SER-004</span>
+          <div>
+            <div class="req-desc">WAF 설정 — OWASP Top 10 차단, SQL Injection · XSS 방어</div>
+            <div class="req-proposal">Managed Rule Set + 트래픽 패턴 분석 후 Custom Rule 추가</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAR -->
+    <div class="req-card">
+      <div class="req-card-header">
+        <span class="req-badge badge-dar">DAR</span>
+        <span class="req-card-name">데이터 요구사항 · 3건</span>
+      </div>
+      <div class="req-card-body">
+        <div class="req-item">
+          <span class="req-num">DAR-001</span>
+          <div>
+            <div class="req-desc">데이터 백업 — RDS 스냅샷 7일 보존, S3 버전 관리 활성화</div>
+            <div class="req-proposal">AWS Backup 통합 관리 · Lambda + CloudWatch로 교차 리전 복사 자동화 예정</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">DAR-002</span>
+          <div>
+            <div class="req-desc">데이터 보존 및 삭제 정책 — 개인정보보호법 준수, 계층형 스토리지 전략</div>
+            <div class="req-proposal">S3 Lifecycle: Standard → Standard-IA → Glacier 자동 이전</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">DAR-003</span>
+          <div>
+            <div class="req-desc">데이터 무결성 검증 — RDS 트랜잭션 보장, S3 99.999999999% 내구성</div>
+            <div class="req-proposal">AWS Glue ETL로 스키마 정의 · SNS 알림 기반 무결성 위반 감지</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PER -->
+    <div class="req-card">
+      <div class="req-card-header">
+        <span class="req-badge badge-per">PER</span>
+        <span class="req-card-name">성능 요구사항 · 3건</span>
+      </div>
+      <div class="req-card-body">
+        <div class="req-item">
+          <span class="req-num">PER-001</span>
+          <div>
+            <div class="req-desc">고가용성 — 최소 2개 AZ 분산, RTO/RPO 목표 내 복구</div>
+            <div class="req-proposal">RDS Multi-AZ 자동 페일오버 · ALB Health Check 기반 자동 교체</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">PER-002</span>
+          <div>
+            <div class="req-desc">빠른 응답 시간 — 정적 콘텐츠 CDN 캐싱, AI 챗봇 응답 지연 최소화</div>
+            <div class="req-proposal">CloudFront 엣지 캐싱 · Kendra 검색 최적화 · Bedrock 프롬프트 효율화</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">PER-003</span>
+          <div>
+            <div class="req-desc">확장성 — 트래픽 급증 시 EC2 자동 증설, S3 무한 스토리지 확장</div>
+            <div class="req-proposal">ASG 수평 확장 · RDS 스토리지 자동 확장 · EKS Cluster Autoscaler</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPS -->
+    <div class="req-card">
+      <div class="req-card-header">
+        <span class="req-badge badge-ops">OPS</span>
+        <span class="req-card-name">운영 / 제약 요구사항 · 4건</span>
+      </div>
+      <div class="req-card-body">
+        <div class="req-item">
+          <span class="req-num">OPS-001</span>
+          <div>
+            <div class="req-desc">데이터 중앙화 — Kendra 인덱스로 단일 검색 창구 제공</div>
+            <div class="req-proposal">Gmail · Google Drive · S3 멀티 소스 연동 중앙 색인</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">COR-001</span>
+          <div>
+            <div class="req-desc">법적 준수 — 개인정보보호법, 전자상거래법, 로그 보존 기준</div>
+            <div class="req-proposal">CloudTrail API 로그 보존 · Kendra PII 편집 기능 검토</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">COR-002</span>
+          <div>
+            <div class="req-desc">비용 제약 — 온디맨드 + 스팟 혼합, 서비스별 독립 S3 버킷</div>
+            <div class="req-proposal">Kendra 동기화 주기 최적화 · Bedrock 프롬프트 엔지니어링으로 토큰 절감</div>
+          </div>
+        </div>
+        <div class="req-item">
+          <span class="req-num">COR-003</span>
+          <div>
+            <div class="req-desc">기술 제약 — 데이터베이스 MySQL 8.0 / PostgreSQL 우선 선택</div>
+            <div class="req-proposal">Amazon RDS for MySQL / PostgreSQL 완전 관리형 서비스 사용</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ──────────── 03 WEB INFRA ──────────── -->
+<section id="web">
+  <div class="section-header reveal">
+    <span class="section-num">03</span>
+    <h2 class="section-title">웹 서비스 인프라</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="arch-flow reveal">
+    <div class="arch-step">
+      <div class="arch-step-box">Route 53</div>
+      <div class="arch-step-label">DNS 라우팅</div>
+    </div>
+    <div class="arch-arrow">›</div>
+    <div class="arch-step">
+      <div class="arch-step-box">WAF</div>
+      <div class="arch-step-label">공격 차단</div>
+    </div>
+    <div class="arch-arrow">›</div>
+    <div class="arch-step">
+      <div class="arch-step-box">CloudFront</div>
+      <div class="arch-step-label">CDN 캐싱</div>
+    </div>
+    <div class="arch-arrow">›</div>
+    <div class="arch-step">
+      <div class="arch-step-box">ALB</div>
+      <div class="arch-step-label">로드밸런싱</div>
+    </div>
+    <div class="arch-arrow">›</div>
+    <div class="arch-step">
+      <div class="arch-step-box">EC2 ASG</div>
+      <div class="arch-step-label">자동 확장</div>
+    </div>
+    <div class="arch-arrow">›</div>
+    <div class="arch-step">
+      <div class="arch-step-box">WAS / DB</div>
+      <div class="arch-step-label">애플리케이션</div>
+    </div>
+  </div>
+
+  <div class="overview-grid reveal">
+    <div class="card">
+      <div class="card-title">🔁 고가용성 웹 인프라</div>
+      <div class="card-body">
+        ALB → Auto Scaling Group 구성으로 트래픽 급증 시 EC2 자동 증설.
+        Health Check 기반 장애 서버 자동 교체. WAS + DB 분리된 멀티 티어 구성.
+        두 개의 가용 영역(AZ-A / AZ-B)에 분산 배치하여 단일 AZ 장애를 허용합니다.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">☁️ 서버리스 문의 시스템</div>
+      <div class="card-body">
+        S3 정적 페이지 호스팅 + CloudFront CDN 캐싱·가속.
+        Lambda + SNS 이벤트 기반 처리로 상시 EC2 운영 없이 과금 효율화.
+        요청이 있을 때만 과금되는 구조로 운영 비용을 절감합니다.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🛡️ 보안 다층 방어</div>
+      <div class="card-body">
+        WAF: SQL Injection·XSS 차단 (OWASP Managed Rule Set).
+        ACM: SSL/TLS 인증서 암호화. Session Manager: SSH 포트 미개방.
+        Private Subnet: WAS·DB 외부 미노출. IAM 최소 권한 원칙 적용.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 로그인 서비스 흐름</div>
+      <div class="card-body">
+        고객 브라우저 접속 → Route 53 DNS 쿼리 → WAF 공격 차단 →
+        CloudFront 캐싱 전송 → ALB 로드밸런싱 → WAS 인증 처리 → DB 계정 대조.
+        세션은 Redis 또는 RDS 기반으로 유지합니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── 04 AI RAG ──────────── -->
+<section id="ai">
+  <div class="section-header reveal">
+    <span class="section-num">04</span>
+    <h2 class="section-title">사내 AI RAG 인프라</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="rag-flow reveal">
+    <div class="arch-step">
+      <div class="rag-step-box">사내 직원</div>
+      <div class="arch-step-label">Q&A 페이지 접속</div>
+    </div>
+    <div class="arch-arrow">›</div>
+    <div class="arch-step">
+      <div class="rag-step-box">S3</div>
+      <div class="arch-step-label">정적 페이지 로드</div>
+    </div>
+    <div class="arch-arrow">›</div>
+    <div class="arch-step">
+      <div class="rag-step-box">Lambda</div>
+      <div class="arch-step-label">질문 수신·처리</div>
+    </div>
+    <div class="arch-arrow">›</div>
+    <div class="arch-step">
+      <div class="rag-step-box">Kendra</div>
+      <div class="arch-step-label">문서 의미 검색</div>
+    </div>
+    <div class="arch-arrow">›</div>
+    <div class="arch-step">
+      <div class="rag-step-box">Bedrock</div>
+      <div class="arch-step-label">AI 답변 생성</div>
+    </div>
+    <div class="arch-arrow">›</div>
+    <div class="arch-step">
+      <div class="rag-step-box">직원</div>
+      <div class="arch-step-label">답변 수신</div>
+    </div>
+  </div>
+
+  <div class="datasource-grid reveal">
+    <div class="datasource-card ds-gmail">
+      <div class="ds-title"><span class="ds-dot"></span>Google Gmail</div>
+      <div class="ds-item">승인·의사결정 메일을 RAG 컨텍스트로 활용</div>
+      <div class="ds-item">제목·본문·첨부(PDF/IMG) 자동 색인</div>
+      <div class="ds-item">1시간 주기 증분 동기화로 비용 절감</div>
+      <div class="ds-item">스팸·광고 필터링으로 검색 정확도 향상</div>
+    </div>
+    <div class="datasource-card ds-drive">
+      <div class="ds-title"><span class="ds-dot"></span>Google Drive</div>
+      <div class="ds-item">업무 DOCX 파일 자동 수집·색인</div>
+      <div class="ds-item">부서별 공유 드라이브 포함 탐색</div>
+      <div class="ds-item">Drive ACL 권한 그대로 상속</div>
+      <div class="ds-item">1시간 주기 증분 동기화</div>
+    </div>
+    <div class="datasource-card ds-s3">
+      <div class="ds-title"><span class="ds-dot"></span>Amazon S3</div>
+      <div class="ds-item">사내 규정 PDF 파일 중앙 보관</div>
+      <div class="ds-item">Kendra와 직접 연결해 PDF 본문 색인</div>
+      <div class="ds-item">저장·전송량 기준 과금으로 저비용</div>
+      <div class="ds-item">Q&A 정적 페이지 파일 배포</div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── 05 COST ──────────── -->
+<section id="cost">
+  <div class="section-header reveal">
+    <span class="section-num">05</span>
+    <h2 class="section-title">비용 산출 근거</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <p class="reveal" style="color:var(--text-dim);font-size:13px;margin-bottom:16px;line-height:1.8;">
+    서울 리전(ap-northeast-2) 기준 월간 예상 비용입니다. 수량·단가·산출식을 명시하여 투명한 비용 근거를 확보했습니다.
+  </p>
+
+  <div class="cost-table-wrap reveal">
+    <table>
+      <thead>
+        <tr>
+          <th>카테고리</th>
+          <th>서비스</th>
+          <th>수량</th>
+          <th>단가</th>
+          <th>산출식</th>
+          <th>월 예상 비용</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="cat-compute">컴퓨팅</td>
+          <td class="cost-service">EC2 (t2.micro)</td>
+          <td class="cost-qty">2–5대</td>
+          <td class="cost-unit">$0.0117/hr</td>
+          <td class="cost-note">0.0117 × 2 × 730hr</td>
+          <td class="cost-monthly">~$17.09</td>
+        </tr>
+        <tr>
+          <td class="cat-compute">컴퓨팅</td>
+          <td class="cost-service">EKS 워커 노드</td>
+          <td class="cost-qty">4+</td>
+          <td class="cost-unit">$0.10/hr</td>
+          <td class="cost-note">클러스터 $73/월 + 노드 비용</td>
+          <td class="cost-monthly">~$73+</td>
+        </tr>
+        <tr>
+          <td class="cat-compute">컴퓨팅</td>
+          <td class="cost-service">AWS Lambda</td>
+          <td class="cost-qty">1</td>
+          <td class="cost-unit">$0.20/1M 호출</td>
+          <td class="cost-note">요청 수에 따라 변동</td>
+          <td class="cost-monthly">~$0.20</td>
+        </tr>
+        <tr>
+          <td class="cat-network">네트워크</td>
+          <td class="cost-service">NAT Gateway</td>
+          <td class="cost-qty">3개</td>
+          <td class="cost-unit">$0.057/hr</td>
+          <td class="cost-note">0.057 × 3 × 730hr</td>
+          <td class="cost-monthly">~$124.83</td>
+        </tr>
+        <tr>
+          <td class="cat-network">네트워크</td>
+          <td class="cost-service">Internet Gateway</td>
+          <td class="cost-qty">2개</td>
+          <td class="cost-unit">$0.09/GB</td>
+          <td class="cost-note">1,000GB × $0.09</td>
+          <td class="cost-monthly">~$90.00</td>
+        </tr>
+        <tr>
+          <td class="cat-network">네트워크</td>
+          <td class="cost-service">VPC Endpoint (EBS 포함)</td>
+          <td class="cost-qty">2개</td>
+          <td class="cost-unit">인스턴스 9개 기준</td>
+          <td class="cost-note">Endpoint + EBS 포함</td>
+          <td class="cost-monthly">~$344.92</td>
+        </tr>
+        <tr>
+          <td class="cat-network">네트워크</td>
+          <td class="cost-service">ALB</td>
+          <td class="cost-qty">2개</td>
+          <td class="cost-unit">$0.0242/hr</td>
+          <td class="cost-note">0.0242 × 2 × 730hr</td>
+          <td class="cost-monthly">~$35.33</td>
+        </tr>
+        <tr>
+          <td class="cat-network">네트워크</td>
+          <td class="cost-service">Route 53</td>
+          <td class="cost-qty">25 호스팅 영역</td>
+          <td class="cost-unit">$0.50/영역</td>
+          <td class="cost-note">25 × $0.50</td>
+          <td class="cost-monthly">~$12.50</td>
+        </tr>
+        <tr>
+          <td class="cat-db">데이터베이스</td>
+          <td class="cost-service">Amazon RDS (Multi-AZ)</td>
+          <td class="cost-qty">2개</td>
+          <td class="cost-unit">$0.252/hr</td>
+          <td class="cost-note">0.252 × 730hr</td>
+          <td class="cost-monthly">~$183.96</td>
+        </tr>
+        <tr>
+          <td class="cat-infra">스토리지</td>
+          <td class="cost-service">Amazon S3</td>
+          <td class="cost-qty">4 버킷</td>
+          <td class="cost-unit">$0.025/GB</td>
+          <td class="cost-note">1,000GB × $0.025</td>
+          <td class="cost-monthly">~$25.00</td>
+        </tr>
+        <tr>
+          <td class="cat-security">보안</td>
+          <td class="cost-service">AWS WAF</td>
+          <td class="cost-qty">3개 규칙</td>
+          <td class="cost-unit">$5.00/Web ACL</td>
+          <td class="cost-note">Web ACL 1개 기준</td>
+          <td class="cost-monthly">~$5.00</td>
+        </tr>
+        <tr>
+          <td class="cat-infra">모니터링</td>
+          <td class="cost-service">Amazon CloudWatch</td>
+          <td class="cost-qty">500개 지표</td>
+          <td class="cost-unit">$0.30/지표 (10개 무료)</td>
+          <td class="cost-note">490 × $0.30</td>
+          <td class="cost-monthly">~$147.00</td>
+        </tr>
+        <tr>
+          <td class="cat-ai">AI / 검색</td>
+          <td class="cost-service">Amazon Kendra</td>
+          <td class="cost-qty">3 인덱스</td>
+          <td class="cost-unit">$4.20/hr</td>
+          <td class="cost-note">4.20 × 3 × 730hr</td>
+          <td class="cost-monthly cost-monthly" style="color:var(--red)">~$9,198</td>
+        </tr>
+        <tr>
+          <td class="cat-ai">AI / 검색</td>
+          <td class="cost-service">Amazon Bedrock</td>
+          <td class="cost-qty">1</td>
+          <td class="cost-unit">$0.0019/1K 입력 토큰</td>
+          <td class="cost-note">사용량에 따라 변동</td>
+          <td class="cost-monthly">$0.0019/1K tok</td>
+        </tr>
+        <tr>
+          <td class="cat-cdn">CDN</td>
+          <td class="cost-service">Amazon CloudFront</td>
+          <td class="cost-qty">3 배포</td>
+          <td class="cost-unit">$0.130/GB</td>
+          <td class="cost-note">500GB × $0.130</td>
+          <td class="cost-monthly">~$65.00</td>
+        </tr>
+        <tr class="cost-total-row">
+          <td colspan="5" style="font-weight:700;color:#fff;">웹 서비스 인프라 합계 (Kendra 제외)</td>
+          <td class="cost-monthly">~$1,124 / 월</td>
+        </tr>
+        <tr class="cost-total-row">
+          <td colspan="5" style="font-weight:700;color:#fff;">AI RAG 총합 (Lambda + S3 + Kendra + Bedrock)</td>
+          <td class="cost-monthly" style="color:var(--accent2);">~$394 (실측)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="reveal" style="color:var(--text-muted);font-size:11px;line-height:1.7;">
+    ※ 실측값은 개발·테스트 기간 소규모 트래픽 기준. Kendra는 상용화 시 인덱스 수 조정 및 동기화 주기 최적화로 비용 절감 가능.
+    EC2·RDS는 온디맨드+스팟 혼합 및 Savings Plans 적용 시 30–40% 절감 여지 있음.
+  </p>
+</section>
+
+<!-- ──────────── 06 ROADMAP ──────────── -->
+<section id="roadmap">
+  <div class="section-header reveal">
+    <span class="section-num">06</span>
+    <h2 class="section-title">향후 계획</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="roadmap reveal">
+
+    <div class="roadmap-phase phase-1">
+      <div class="roadmap-header">
+        <div class="roadmap-phase-num">1</div>
+        <div>
+          <div class="roadmap-phase-title">DR 자동화 파이프라인 구축</div>
+          <div class="roadmap-phase-sub">재해 복구 시나리오 자동화</div>
+        </div>
+      </div>
+      <div class="roadmap-body">
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          Lambda + CloudWatch Events로 RDS 스냅샷 생성·교차 리전 복사(Cross-Region Replication)를 스케줄 기반으로 자동화합니다.
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          장애 감지 시 다른 리전에서 RDS 인스턴스를 자동 복원하고, Route 53 DNS 레코드 변경으로 트래픽을 자동 전환하는 DR 워크플로우를 구축합니다.
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          RTO(목표 복구 시간) 및 RPO(목표 복구 시점)를 정량 목표로 설정하고, 분기별 모의 훈련을 통해 워크플로우를 검증합니다.
+        </div>
+      </div>
+    </div>
+
+    <div class="roadmap-phase phase-2">
+      <div class="roadmap-header">
+        <div class="roadmap-phase-num">2</div>
+        <div>
+          <div class="roadmap-phase-title">GCP 권한 기반 접근 제어</div>
+          <div class="roadmap-phase-sub">계정별 RAG 접근 권한 차등 적용</div>
+        </div>
+      </div>
+      <div class="roadmap-body">
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          현재 Google Drive ACL을 Kendra에서 상속하는 방식에서 나아가, 사용자별 조직 계정 정보를 Lambda에서 검증한 후 Kendra 쿼리 필터에 반영합니다.
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          직급·팀 단위 문서 접근 정책을 Kendra의 Access Control List(ACL)와 연동하여 민감 문서가 권한 없는 직원에게 노출되지 않도록 합니다.
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          AWS IAM Identity Center와 SSO를 연계하여 사내 시스템 로그인을 단일화하고 권한 관리 오버헤드를 줄입니다.
+        </div>
+      </div>
+    </div>
+
+    <div class="roadmap-phase phase-3">
+      <div class="roadmap-header">
+        <div class="roadmap-phase-num">3</div>
+        <div>
+          <div class="roadmap-phase-title">데이터 보존·삭제 자동화</div>
+          <div class="roadmap-phase-sub">규제 대응 및 비용 최적화</div>
+        </div>
+      </div>
+      <div class="roadmap-body">
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          GDPR·국내 개인정보보호법 변화에 맞춰 데이터 삭제·익명화 절차를 자동화하는 솔루션(AWS Macie + Lambda) 도입을 검토합니다.
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          S3 Intelligent-Tiering을 적용하여 접근 빈도에 따라 스토리지 클래스를 자동 조정하고, Glacier Instant Retrieval로 아카이빙 비용을 절감합니다.
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          데이터 파이프라인(Kinesis → Glue ETL)에 유효성 검사 모듈을 추가하고, 무결성 위반 감지 시 SNS 알림 및 초기 복구 워크플로우를 자동 트리거합니다.
+        </div>
+      </div>
+    </div>
+
+    <div class="roadmap-phase phase-4">
+      <div class="roadmap-header">
+        <div class="roadmap-phase-num">4</div>
+        <div>
+          <div class="roadmap-phase-title">AI 답변 품질 지속 개선</div>
+          <div class="roadmap-phase-sub">사용자 피드백 루프 고도화</div>
+        </div>
+      </div>
+      <div class="roadmap-body">
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          Q&A 인터페이스에 👍 / 👎 피드백 버튼을 추가하고, DynamoDB에 피드백 데이터를 축적하여 답변 품질을 정량적으로 추적합니다.
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          피드백 점수가 낮은 질의 유형을 분석해 Kendra 인덱스의 Relevance Tuning과 Bedrock 시스템 프롬프트를 개선하는 주기적 리뷰 프로세스를 도입합니다.
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          Kendra 동기화 주기를 트래픽 패턴에 따라 가변 조정하고, Bedrock 온디맨드 토큰 과금 최적화를 통해 AI 서비스 운영 비용을 단계적으로 절감합니다.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ──────────── 07 RESULTS ──────────── -->
+<section id="results">
+  <div class="section-header reveal">
+    <span class="section-num">07</span>
+    <h2 class="section-title">구현 성과</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="results-grid reveal">
+    <div class="result-card">
+      <div class="result-num" style="color:var(--accent);">2 AZ</div>
+      <div class="result-label">다중 가용 영역 분산</div>
+      <div class="result-desc">
+        ALB + ASG로 AZ-A / AZ-B에 분산 배치. 단일 AZ 장애 시 자동으로 트래픽이 정상 AZ로 전환되어 무중단 운영을 실현합니다.
+      </div>
+    </div>
+    <div class="result-card">
+      <div class="result-num" style="color:var(--green);">0</div>
+      <div class="result-label">SSH 포트 개방 수</div>
+      <div class="result-desc">
+        Session Manager 기반 접근으로 SSH 22번 포트를 완전히 닫아 공격 노출 면적을 최소화했습니다.
+      </div>
+    </div>
+    <div class="result-card">
+      <div class="result-num" style="color:var(--accent2);">3종</div>
+      <div class="result-label">RAG 데이터 소스 연동</div>
+      <div class="result-desc">
+        Gmail · Google Drive · Amazon S3를 Kendra 단일 인덱스로 통합해 사내 분산 문서를 의미 기반으로 검색합니다.
+      </div>
+    </div>
+    <div class="result-card">
+      <div class="result-num" style="color:#a78bfa;">1hr</div>
+      <div class="result-label">증분 동기화 주기</div>
+      <div class="result-desc">
+        전체 재색인 없이 변경분만 동기화하여 Kendra 인덱싱 비용을 절감하면서도 문서 최신성을 유지합니다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────── 08 RETROSPECTIVE ──────────── -->
+<section id="retro">
+  <div class="section-header reveal">
+    <span class="section-num">08</span>
+    <h2 class="section-title">프로젝트 회고</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="retro-grid reveal">
+    <div class="retro-card">
+      <div class="retro-idx">01</div>
+      <div class="retro-content">
+        <div class="retro-title">인프라 설계의 비용 최적화 관점</div>
+        <div class="retro-body">
+          Lambda + S3 서버리스 구성을 통해 상시 EC2 운영 대비 비용을 절감했습니다.
+          서비스 요구사항에 맞는 아키텍처 선택이 단순한 기술 도입을 넘어
+          비용 구조에 직접 영향을 미친다는 점을 실감했습니다.
+        </div>
+      </div>
+    </div>
+    <div class="retro-card">
+      <div class="retro-idx">02</div>
+      <div class="retro-content">
+        <div class="retro-title">보안은 설계 단계부터</div>
+        <div class="retro-body">
+          WAF · ACM · Session Manager · Private Subnet을 조합하여 다층 보안 구조를 설계했습니다.
+          SSH 포트 미개방과 IAM 권한 기반 접근 제어를 통해, 보안은 운영 중 추가하는 것이 아니라
+          설계 시점부터 고려해야 함을 배웠습니다.
+        </div>
+      </div>
+    </div>
+    <div class="retro-card">
+      <div class="retro-idx">03</div>
+      <div class="retro-content">
+        <div class="retro-title">AI 서비스 통합의 실무 경험</div>
+        <div class="retro-body">
+          Amazon Kendra · Bedrock · Lambda를 연동하여 RAG 파이프라인을 직접 구현했습니다.
+          Gmail · Drive · S3 다중 소스 연결 과정에서 권한 설정과 동기화 주기 조절 등
+          실무에서 마주치는 세부 문제들을 직접 해결했습니다.
+        </div>
+      </div>
+    </div>
+    <div class="retro-card">
+      <div class="retro-idx">04</div>
+      <div class="retro-content">
+        <div class="retro-title">VOC 기반 사용자 관점의 중요성</div>
+        <div class="retro-body">
+          엔지니어의 관점과 실 사용자의 관점이 다를 수 있음을 프로젝트를 통해 깨달았습니다.
+          기능이 동작하는 것을 넘어 사용자가 실제로 원하는 방식으로 서비스가 제공되는지
+          지속적으로 검토하는 자세가 필요하다는 것을 배웠습니다.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <strong>임영민</strong> · Cloud Infrastructure Engineer
+  </div>
+  <div class="footer-meta">MSP 솔루션 아키텍트 양성과정 · 2025.04 – 2025.06</div>
+</footer>
+
+<script>
+  // 브라우저 스크롤 시에만 애니메이션 적용
+  // 인쇄/PDF 변환 시에는 모든 요소가 기본 표시됨
+  document.querySelectorAll('.reveal').forEach(el => {
+    el.classList.add('reveal-hidden');
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.reveal-hidden').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
